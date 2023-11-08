@@ -1,9 +1,11 @@
 dataset:
-    train_csv:
-    test_csv:
+    train_csv: /content/drive/MyDrive/ml_competition1_data/train.csv
+    test_csv: /content/drive/MyDrive/ml_competition1_data/test.csv
     add_sq_feats: True
     add_additional_feats: True
 
 training:
     model_name: logistic_regression
-    logistic_regression:  {'is_cv: False','is_weighted_loss': True,'num_epochs': 3000, 'learning_rate':0.1, 'lambda1':0.001, 'lambda2':0.001}
+    logistic_regression:  {'is_cv': True,'is_weighted_loss': True,'num_epochs': 3000, 'learning_rate':0.1, 'lambda1':0.001, 'lambda2':0.001}
+test:
+    save_dir: ./

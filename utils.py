@@ -14,7 +14,7 @@ def normalise(X, norm='standard'):
     else:
         raise ValueError('Not a valid normalisation. Available options: standard, min_max')
 
-def add_feats(df, dataset_config):
+def add_feats(df, dataset_config, model_name):
     '''
         Add the additional features to the dataframe
     '''
@@ -25,14 +25,14 @@ def add_feats(df, dataset_config):
         df = df_new
     
     if dataset_config['add_additional_feats']:
-        df['U850_V850'] = df['U850']*df['V850']
-        df['UBOT_VBOT'] = df['UBOT']*df['VBOT']
         df['PS_PSL'] = df['PS']*df['PSL']
         df['T200_T500'] = df['T200']*df['T500']
         df['Z1000_Z200'] = df['Z1000']*df['Z200']
         df['month'] = df['time'].apply(lambda x: int(str(x)[4:6]))
         df['U850_UBOT'] = df['U850']*df['UBOT']
         df['V850_VBOT'] = df['V850']*df['VBOT']
+        df['U850_V850'] = df['U850']*df['V850']
+        df['UBOT_VBOT'] = df['UBOT']*df['VBOT']
     
     return df
 
@@ -49,14 +49,14 @@ def get_data(df, features, model_name='logistic_regression', is_test=False):
     if is_test:
         return np.array(df[features])
     if model_name=='logistic_regression':
-        X,y = np.array(df['features']), np.array(df['Label'])
+        X,y = np.array(df[features]), np.array(df['Label'])
         return X, convert_one_hot(y)
     elif model_name=='xgboost':
         pass
     elif model_name=='svm':
         pass
     else:
-        raise ValueError('Not a valif model name')
+        raise ValueError('Not a valid model name')
 
 
     

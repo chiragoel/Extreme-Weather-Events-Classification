@@ -97,7 +97,7 @@ class MultiClassLogisticRegression:
 
         return acc, loss
 
-    def fit(self, X_train, y_train, X_val, y_val):
+    def fit(self, X_train, y_train, X_val, y_val, verbose=1):
 
         self.W = np.random.randn(X_train.shape[0],self.num_classes)*0.01 #16x3
         self.b = np.zeros((self.num_classes,1)) #3x1
@@ -126,6 +126,8 @@ class MultiClassLogisticRegression:
 
             val_acc, val_loss = self.evaluate_model(X_val, y_val, self.W, self.b)
 
+            if loss==np.nan:
+                break
             if val_acc >= best_val_loss:
                 self.best_W, self.best_b = self.W, self.b
                 best_val_loss = val_acc
@@ -135,7 +137,7 @@ class MultiClassLogisticRegression:
             self.W = self.W - (1./self.m)*self.learning_rate*dW + (1./self.m)*self.lambda2*2.0*self.W + (1./self.m)*self.lambda1
             self.b = self.b - (1./self.m)*self.learning_rate*db
 
-            if epoch%5==0:
+            if epoch%5==0 and verbose==1:
                 print(f'Epoch {epoch}, Training loss {loss}, Val Loss {val_loss}, Val Acc {val_acc}')
 
         return self.best_W, self.best_b

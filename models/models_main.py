@@ -20,8 +20,15 @@ def cv_logistic_regression(X_train, y_train, X_val, y_val):
                         lambda2=lambda2, 
                         num_epochs=epoch
                         )
-                    W, b = clf.fit(X_train.T, y_train, X_val.T, y_val)
+                    W, b = clf.fit(X_train.T, y_train, X_val.T, y_val, verbose=0)
                     acc, loss = clf.evaluate_model(X_val.T, y_val, W, b)
                     if acc>best_acc:
                         best_num_epochs, best_lr, best_lambda1, best_lambda2 = epoch, learning_rate, lambda1, lambda2
                         best_acc=acc
+                        
+    print('Best hyparams: ', best_lr, best_lambda1, best_lambda2, best_num_epochs)
+    return best_lr, best_lambda1, best_lambda2, best_num_epochs
+
+def cv_svm(X_train, y_train, X_val, y_val):
+    pass
+            
