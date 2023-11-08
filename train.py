@@ -18,6 +18,18 @@ def train_logistic_regression(df_train, feats, training_hyperparams):
         X_train, X_val = split_dataset(X)
         y_train, y_val = split_dataset(y)
         hyperparams['learning_rate'], hyperparams['lambda1'], hyperparams['lambda2'], hyperparams['num_epochs']  = cv_logistic_regression(X_train, y_train, X_val, y_val)
+
+    if training_hyperparams['is_training_curve']:
+        clf = MultiClassLogisticRegression(
+            is_weighted=hyperparams['is_weighted_loss'], 
+            learning_rate=hyperparams['learning_rate'], 
+            lambda1=hyperparams['lambda1'], 
+            lambda2=hyperparams['lambda2'], 
+            num_epochs=hyperparams['num_epochs']
+            )
+        X_train, X_val = split_dataset(X)
+        y_train, y_val = split_dataset(y)
+        _,_ = clf.fit(X_train.T, y_train, X_val.T, y_val,plot_curves=True)
     
     clf = MultiClassLogisticRegression(
         is_weighted=hyperparams['is_weighted_loss'], 
@@ -26,6 +38,7 @@ def train_logistic_regression(df_train, feats, training_hyperparams):
         lambda2=hyperparams['lambda2'], 
         num_epochs=hyperparams['num_epochs']
         )
+
     best_W, best_b = clf.fit(X.T, y, X.T, y)
     return best_W, best_b
 
@@ -61,12 +74,12 @@ if __name__ == '__main__':
     if model_name=='logistic_regression':
         feats = [x for x in df_train.columns if x not in ['Label', 'lat', 'lon','time']]
         W,b = train_logistic_regression(df_train, feats, config['training']['logistic_regression'])
-        y_pred = np.argmax(test_logistic_regression(df_test_, feats, W, b), axis=0)
-        df_test['Label'] = y_pred
-        df_submit = df_test[['SNo', 'Label']]
-        df_submit.to_csv(os.path.join(config['test']['save_dir'], 'result.csv'), index=False)
-        np.save(os.path.join(config['test']['save_dir'], 'W.npy'), W)
-        np.save(os.path.join(config['test']['save_dir'], 'b.npy'), b)
+        # y_pred = np.argmax(test_logistic_regression(df_test_, feats, W, b), axis=0)
+        # df_test['Label'] = y_pred
+        # df_submit = df_test[['SNo', 'Label']]
+        # df_submit.to_csv(os.path.join(config['test']['save_dir'], 'result.csv'), index=False)
+        # np.save(os.path.join(config['test']['save_dir'], 'W.npy'), W)
+        # np.save(os.path.join(config['test']['save_dir'], 'b.npy'), b)
     elif model_name=='svm':
         pass
     elif model_name=='xgboost':

@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 np.random.seed(0)
 
@@ -36,6 +37,14 @@ class MultiClassLogisticRegression:
         self.num_epochs = num_epochs
         self.num_classes = num_classes
 
+    def _plot_curves(self, epoch, param1, param2, save_path='./loss.png'):
+        fig, ax = plt.subplots( nrows=1, ncols=1 )
+        ax.plot(epoch, param1, 'b', label='train')
+        ax.plot(epoch, param2, 'g', label='val')
+        ax.legend(title='Fold')
+        fig.savefig(save_path)
+        plt.close(fig)
+    
     def _get_class_weights(self,y):
         '''
             Function that returns the weights for each class based on the training dataset
@@ -79,6 +88,13 @@ class MultiClassLogisticRegression:
         Z = weights.T.dot(X) + bias
         return self.softmax(Z)
 
+    def _get_accuracy(self, Y_hat,y_test):
+        y_pred = np.argmax(Y_hat, axis=0)
+        y_true = np.argmax(y_test, axis=1)
+
+        acc = len(y_pred[y_pred==y_true])/len(y_true)
+        return acc
+
     def evaluate_model(self, X_test, y_test, W, b):
 
         Y_hat = self.compute_pred(weights=W, bias=b, X=X_test)
@@ -90,14 +106,11 @@ class MultiClassLogisticRegression:
 
         loss+= - np.sum(self.lambda2*(W**2))/self.m - np.sum(self.lambda1*(np.abs(W)))/self.m
 
-        y_pred = np.argmax(Y_hat, axis=0)
-        y_true = np.argmax(y_test, axis=1)
-
-        acc = len(y_pred[y_pred==y_true])/len(y_true)
+        acc = self._get_accuracy(Y_hat,y_test)
 
         return acc, loss
 
-    def fit(self, X_train, y_train, X_val, y_val, verbose=1):
+    def fit(self, X_train, y_train, X_val, y_val, verbose=1, plot_curves=False):
 
         self.W = np.random.randn(X_train.shape[0],self.num_classes)*0.01 #16x3
         self.b = np.zeros((self.num_classes,1)) #3x1
@@ -110,6 +123,7 @@ class MultiClassLogisticRegression:
 
         best_val_loss = float('-inf')
         self.best_W, self.best_b = None, None
+        train_loss, val_loss, train_accuracy, val_accuracy = [], [], [], []
         for epoch in range(1,1+self.num_epochs):
             np.random.shuffle(self.indexes)
             X_train = X_train[:,self.indexes]
@@ -124,7 +138,8 @@ class MultiClassLogisticRegression:
                 loss = compute_weighted_cross_entropy_loss(y_train.T,Y_hat)
             loss+= - np.sum(self.lambda2*(self.W**2))/self.m - np.sum(self.lambda1*(np.abs(self.W)))/self.m
 
-            val_acc, val_loss = self.evaluate_model(X_val, y_val, self.W, self.b)
+            acc = self._get_accuracy(Y_hat,y_train)
+            val_acc, val_l = self.evaluate_model(X_val, y_val, self.W, self.b)
 
             if loss==np.nan:
                 break
@@ -137,8 +152,17 @@ class MultiClassLogisticRegression:
             self.W = self.W - (1./self.m)*self.learning_rate*dW + (1./self.m)*self.lambda2*2.0*self.W + (1./self.m)*self.lambda1
             self.b = self.b - (1./self.m)*self.learning_rate*db
 
-            if epoch%5==0 and verbose==1:
-                print(f'Epoch {epoch}, Training loss {loss}, Val Loss {val_loss}, Val Acc {val_acc}')
+            if epoch%5==0 and verbose==1 and not plot_curves:
+                print(f'Epoch {epoch}, Training loss {loss}, Val Loss {val_l}, Val Acc {val_acc}')
+            if  plot_curves:
+                train_loss.append(loss)
+                val_loss.append(val_l)
+                train_accuracy.append(acc)
+                val_accuracy.append(val_acc)
+
+        if plot_curves:
+            self._plot_curves(list(range(self.num_epochs)), train_loss, val_loss, save_path='./assets/loss.png')
+            self._plot_curves(list(range(self.num_epochs)), train_accuracy, val_accuracy, save_path='./assets/accuracy.png')
 
         return self.best_W, self.best_b
 

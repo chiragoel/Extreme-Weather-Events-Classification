@@ -30,5 +30,7 @@ def cv_logistic_regression(X_train, y_train, X_val, y_val):
     return best_lr, best_lambda1, best_lambda2, best_num_epochs
 
 def cv_svm(X_train, y_train, X_val, y_val):
+    #RBF kernel
+    # c_list = 
     pass
             
