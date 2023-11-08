@@ -30,9 +30,9 @@ def train_logistic_regression(df_train, feats, training_hyperparams):
     return best_W, best_b
 
 def test_logistic_regression(df_test, feats, weights, bias):
-    X = get_data(df_train, feats, model_name=model_name, is_test=True)
+    X = get_data(df_test, feats, model_name=model_name, is_test=True)
     X = normalise(X)
-    Z = weights.T.dot(X) + bias
+    Z = weights.T.dot(X.T) + bias
     return np.exp(Z) / np.sum(np.exp(Z), axis=0)
 
 if __name__ == '__main__':
@@ -54,9 +54,9 @@ if __name__ == '__main__':
     df_test = pd.read_csv(config['dataset']['test_csv'])
     df_test_ = df_test[['lat', 'lon', 'TMQ', 'U850', 'V850', 'UBOT', 'VBOT', 'QREFHT',
        'PS', 'PSL', 'T200', 'T500', 'PRECT', 'TS', 'TREFHT', 'Z1000', 'Z200',
-       'ZBOT', 'time', 'Label']]
+       'ZBOT', 'time']]
 
-    df_test_ = add_feats(df_test_, config['dataset'])
+    df_test_ = add_feats(df_test_, config['dataset'], model_name)
 
     if model_name=='logistic_regression':
         feats = [x for x in df_train.columns if x not in ['Label', 'lat', 'lon','time']]

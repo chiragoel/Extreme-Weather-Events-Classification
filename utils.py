@@ -18,9 +18,10 @@ def add_feats(df, dataset_config, model_name):
     '''
         Add the additional features to the dataframe
     '''
+    feats = [x for x in df.columns if x not in ['Label', 'lat', 'lon','time']]
     if dataset_config['add_sq_feats']:
-        df_squared = df**2
-        df_squared.columns = [i+'_2' for i in list(df.columns)]
+        df_squared = df[feats]**2
+        df_squared.columns = [i+'_2' for i in list(df[feats].columns)]
         df_new = pd.concat([df, df_squared], axis=1)
         df = df_new
     

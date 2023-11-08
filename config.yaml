@@ -6,6 +6,6 @@ dataset:
 
 training:
     model_name: logistic_regression
-    logistic_regression:  {'is_cv': True,'is_weighted_loss': True,'num_epochs': 3000, 'learning_rate':0.1, 'lambda1':0.001, 'lambda2':0.001}
+    logistic_regression:  {'is_cv': False,'is_weighted_loss': True,'num_epochs': 1, 'learning_rate':0.1, 'lambda1':0.001, 'lambda2':0.001}
 test:
     save_dir: ./
