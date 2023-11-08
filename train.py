@@ -74,12 +74,12 @@ if __name__ == '__main__':
     if model_name=='logistic_regression':
         feats = [x for x in df_train.columns if x not in ['Label', 'lat', 'lon','time']]
         W,b = train_logistic_regression(df_train, feats, config['training']['logistic_regression'])
-        # y_pred = np.argmax(test_logistic_regression(df_test_, feats, W, b), axis=0)
-        # df_test['Label'] = y_pred
-        # df_submit = df_test[['SNo', 'Label']]
-        # df_submit.to_csv(os.path.join(config['test']['save_dir'], 'result.csv'), index=False)
-        # np.save(os.path.join(config['test']['save_dir'], 'W.npy'), W)
-        # np.save(os.path.join(config['test']['save_dir'], 'b.npy'), b)
+        y_pred = np.argmax(test_logistic_regression(df_test_, feats, W, b), axis=0)
+        df_test['Label'] = y_pred
+        df_submit = df_test[['SNo', 'Label']]
+        df_submit.to_csv(os.path.join(config['test']['save_dir'], 'result.csv'), index=False)
+        np.save(os.path.join(config['test']['save_dir'], 'W.npy'), W)
+        np.save(os.path.join(config['test']['save_dir'], 'b.npy'), b)
     elif model_name=='svm':
         pass
     elif model_name=='xgboost':
