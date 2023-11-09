@@ -66,11 +66,8 @@ def modelfit(alg, dtrain, predictors,sample_weights=None,X_test=None,useTrainCV=
     print(dtrain['Label'].values.shape, dtrain_predprob.shape, np.unique(dtrain_predictions, return_counts=True))
 
     #Test
-    if len(X_test)>0:
-        dtest_predictions = alg.predict(X_test[predictors])
-        print('test: ', np.unique(dtest_predictions,return_counts=True))
-    else:
-        dtest_predictions=None
+    dtest_predictions = alg.predict(X_test[predictors])
+    print('test: ', np.unique(dtest_predictions,return_counts=True))
 
     # feat_imp = pd.Series(alg.get_booster().get_fscore()).sort_values(ascending=False)
     # feat_imp.plot(kind='bar', title='Feature Importances')

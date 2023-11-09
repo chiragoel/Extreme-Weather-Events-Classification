@@ -119,7 +119,7 @@ if __name__ == '__main__':
             nthread=4,
             num_class=3,
             seed=42)
-        y_pred = modelfit(xgb_model, df_train, feats, df_test_)
+        y_pred = modelfit(xgb_model, df_train, feats, X_test=df_test_)
         df_test['Label'] = y_pred
         df_submit = df_test[['SNo', 'Label']]
         df_submit.to_csv(os.path.join(config['test']['save_dir'], 'result.csv'), index=False)
