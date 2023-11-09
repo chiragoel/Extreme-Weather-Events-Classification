@@ -1,5 +1,6 @@
 import os
 import yaml
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -52,7 +53,11 @@ def test_logistic_regression(df_test, feats, weights, bias):
 
 if __name__ == '__main__':
 
-    with open('./config.yaml', 'r') as stream:
+    parser = argparse.ArgumentParser(description='Extreme Weather Classification')
+    parser.add_argument('--config_path', type=str, default='./config.yaml')
+    args = parser.parse_args()
+    
+    with open(args.config_path, 'r') as stream:
         config = yaml.safe_load(stream)
     
     model_name = config['training']['model_name']
