@@ -2,12 +2,14 @@ import os
 import yaml
 import numpy as np
 import pandas as pd
-
 import matplotlib.pyplot as plt
 
+import xgboost as xgb
+from sklearn import svm
+
 from utils import *
+from models.models_main import *
 from models.logistic_regression import MultiClassLogisticRegression
-from models.models_main import cv_logistic_regression
 
 def train_logistic_regression(df_train, feats, training_hyperparams):
     X,y = get_data(df_train, feats, model_name=model_name, is_test=False)
@@ -72,6 +74,7 @@ if __name__ == '__main__':
     df_test_ = add_feats(df_test_, config['dataset'], model_name)
 
     if model_name=='logistic_regression':
+        
         feats = [x for x in df_train.columns if x not in ['Label', 'lat', 'lon','time']]
         W,b = train_logistic_regression(df_train, feats, config['training']['logistic_regression'])
         y_pred = np.argmax(test_logistic_regression(df_test_, feats, W, b), axis=0)
@@ -80,9 +83,43 @@ if __name__ == '__main__':
         df_submit.to_csv(os.path.join(config['test']['save_dir'], 'result.csv'), index=False)
         np.save(os.path.join(config['test']['save_dir'], 'W.npy'), W)
         np.save(os.path.join(config['test']['save_dir'], 'b.npy'), b)
+    
     elif model_name=='svm':
-        pass
+        
+        hyperparams = config['training']['svm']
+        feats = [x for x in df_train.columns if x not in ['Label', 'lat', 'lon','time', 'U850_UBOT', 'V850_VBOT']]
+        X,y = get_data(df_train, feats, model_name=model_name, is_test=False)
+        X = normalise(X)
+        clf = svm.SVC(kernel=hyperparams['kernel'], gamma=hyperparams['gamma'], degree=hyperparams['degree'], C=hyperparams['C']).fit(X, y)
+
+        X_test = get_data(df_test, feats, model_name=model_name, is_test=True)
+        X_test = normalise(X_test)
+        y_pred = clf.predict(X_test)
+        df_test['Label'] = y_pred
+        df_submit = df_test[['SNo', 'Label']]
+        df_submit.to_csv(os.path.join(config['test']['save_dir'], 'result.csv'), index=False)
+
     elif model_name=='xgboost':
-        pass
+        hyperparams = config['training']['xgboost']
+        feats = [x for x in df_train.columns if x not in ['time', 'lat', 'lon','Label']]
+        xgb = xgb.sklearn.XGBClassifier(
+            learning_rate = hyperparams['learning_rate'],
+            n_estimators=hyperparams['n_estimators'],
+            max_depth=hyperparams['max_depth'],
+            min_child_weight=hyperparams['min_child_weight'],
+            gamma=hyperparams['gamma'],
+            subsample=hyperparams['subsample'],
+            colsample_bytree=hyperparams['colsample_bytree'], 
+            reg_alpha=hyperparams['reg_alpha'],
+            reg_lambda = hyperparams['reg_lambda'],
+            objective= 'multi:softmax',
+            nthread=4,
+            num_class=3,
+            seed=42)
+        y_pred = modelfit(xgb, df_train, feats, df_test)
+        df_test['Label'] = y_pred
+        df_submit = df_test[['SNo', 'Label']]
+        df_submit.to_csv(os.path.join(config['test']['save_dir'], 'result.csv'), index=False)
+
     else:
         raise ValueError('Not a valid model name. Available models: logistic_regression, svm, xgboost')

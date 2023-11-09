@@ -55,7 +55,8 @@ def get_data(df, features, model_name='logistic_regression', is_test=False):
     elif model_name=='xgboost':
         pass
     elif model_name=='svm':
-        pass
+        X,y = np.array(df[features]), np.array(df['Label'])
+        return X, y
     else:
         raise ValueError('Not a valid model name')
 
