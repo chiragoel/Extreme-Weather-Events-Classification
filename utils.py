@@ -2,11 +2,17 @@ import numpy as np
 import pandas as pd
 
 def split_dataset(data):
+    '''
+        Split the given dataset in a 80/20 ratio for train and val
+    '''
     train = data[[i for i in range(data.shape[0]) if i%5 in [0,1,2,3]]]
     val = data[[i for i in range(data.shape[0]) if i%5 in [4]]]
     return (train, val)
 
 def normalise(X, norm='standard'):
+    '''
+        Normalise the given data. Can be normalised using standard scaler or min-max
+    '''
     if norm=='standard':
         return (X-X.mean(axis=0))/X.std(axis=0)
     elif norm=='min_max':
@@ -38,6 +44,9 @@ def add_feats(df, dataset_config, model_name):
     return df
 
 def convert_one_hot(y):
+    '''
+        Convert the categorical labels to one hot
+    '''
     
     num_classes = len(np.unique(y))
     y_one_hot = np.zeros((y.shape[0], num_classes))
@@ -47,6 +56,9 @@ def convert_one_hot(y):
 
 def get_data(df, features, model_name='logistic_regression', is_test=False):
     
+    '''
+        Get the required data for each classifier
+    '''
     if is_test:
         return np.array(df[features])
     if model_name=='logistic_regression':
