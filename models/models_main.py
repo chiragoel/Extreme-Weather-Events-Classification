@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+import xgboost as xgb
 from sklearn.metrics import accuracy_score, f1_score
 
 from models.logistic_regression import MultiClassLogisticRegression
@@ -65,7 +66,7 @@ def modelfit(alg, dtrain, predictors,sample_weights=None,X_test=None,useTrainCV=
     print(dtrain['Label'].values.shape, dtrain_predprob.shape, np.unique(dtrain_predictions, return_counts=True))
 
     #Test
-    if len(X_test)>0
+    if len(X_test)>0:
         dtest_predictions = alg.predict(X_test[predictors])
         print('test: ', np.unique(dtest_predictions,return_counts=True))
     else:

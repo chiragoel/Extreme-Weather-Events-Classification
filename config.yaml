@@ -9,5 +9,6 @@ training:
     logistic_regression:  {'is_cv': False,'is_training_curve':True,'is_weighted_loss': True,'num_epochs': 3000, 'learning_rate':0.1, 'lambda1':0.001, 'lambda2':0.001}
     svm: {'kernel':'poly', 'gamma':'scale', 'degree':4, 'C':10}
     xgboost: {'learning_rate':0.1, 'n_estimators':10000, 'max_depth':10, 'min_child_weight':1, 'gamma':0.0, 'subsample':0.6, 'colsample_bytree':0.55, 'reg_alpha':100, 'reg_lambda':100}
+
 test:
     save_dir: ./

@@ -75,6 +75,7 @@ if __name__ == '__main__':
 
     if model_name=='logistic_regression':
         
+        print('Training Logistic Regression')
         feats = [x for x in df_train.columns if x not in ['Label', 'lat', 'lon','time']]
         W,b = train_logistic_regression(df_train, feats, config['training']['logistic_regression'])
         y_pred = np.argmax(test_logistic_regression(df_test_, feats, W, b), axis=0)
@@ -87,12 +88,13 @@ if __name__ == '__main__':
     elif model_name=='svm':
         
         hyperparams = config['training']['svm']
+        print('Training SVM with the following hyperparameters', hyperparams)
         feats = [x for x in df_train.columns if x not in ['Label', 'lat', 'lon','time', 'U850_UBOT', 'V850_VBOT']]
         X,y = get_data(df_train, feats, model_name=model_name, is_test=False)
         X = normalise(X)
         clf = svm.SVC(kernel=hyperparams['kernel'], gamma=hyperparams['gamma'], degree=hyperparams['degree'], C=hyperparams['C']).fit(X, y)
 
-        X_test = get_data(df_test, feats, model_name=model_name, is_test=True)
+        X_test = get_data(df_test_, feats, model_name=model_name, is_test=True)
         X_test = normalise(X_test)
         y_pred = clf.predict(X_test)
         df_test['Label'] = y_pred
@@ -101,8 +103,9 @@ if __name__ == '__main__':
 
     elif model_name=='xgboost':
         hyperparams = config['training']['xgboost']
+        print('Training XGboost with the following hyperparameters', hyperparams)
         feats = [x for x in df_train.columns if x not in ['time', 'lat', 'lon','Label']]
-        xgb = xgb.sklearn.XGBClassifier(
+        xgb_model = xgb.sklearn.XGBClassifier(
             learning_rate = hyperparams['learning_rate'],
             n_estimators=hyperparams['n_estimators'],
             max_depth=hyperparams['max_depth'],
@@ -116,7 +119,7 @@ if __name__ == '__main__':
             nthread=4,
             num_class=3,
             seed=42)
-        y_pred = modelfit(xgb, df_train, feats, df_test)
+        y_pred = modelfit(xgb_model, df_train, feats, df_test_)
         df_test['Label'] = y_pred
         df_submit = df_test[['SNo', 'Label']]
         df_submit.to_csv(os.path.join(config['test']['save_dir'], 'result.csv'), index=False)
