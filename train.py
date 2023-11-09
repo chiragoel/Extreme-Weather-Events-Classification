@@ -13,6 +13,14 @@ from models.models_main import *
 from models.logistic_regression import MultiClassLogisticRegression
 
 def train_logistic_regression(df_train, feats, training_hyperparams):
+    '''
+        Train the Logistic regression model
+        Args:
+            df_train: The pandas dataframe
+            feats: List of all the features to use for model training
+            training_hyperparams: Hyperparameters for the model
+        Returns trained weights
+    '''
     X,y = get_data(df_train, feats, model_name=model_name, is_test=False)
     X = normalise(X)
 
@@ -46,6 +54,15 @@ def train_logistic_regression(df_train, feats, training_hyperparams):
     return best_W, best_b
 
 def test_logistic_regression(df_test, feats, weights, bias):
+    '''
+        Testing function for logistic regression
+        Args:
+            df_test: The test dataframe
+            feats: The list of features to use
+            weights: Trained weights
+            bias: Trained bias
+        Returns predicted output
+    '''
     X = get_data(df_test, feats, model_name=model_name, is_test=True)
     X = normalise(X)
     Z = weights.T.dot(X.T) + bias
